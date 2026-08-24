@@ -105,11 +105,17 @@ const searchIndex = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
     <script is:inline>
-      // Theme boot — runs before paint to avoid flashes.
-      const t =
-        localStorage.getItem("theme") ??
-        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-      document.documentElement.dataset.theme = t
+      // Theme boot — runs before paint to avoid flashes. Re-applied after
+      // every client-side navigation: the ClientRouter swaps <html>
+      // attributes, which would otherwise reset the theme to light.
+      const applyTheme = () => {
+        const t =
+          localStorage.getItem("theme") ??
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+        document.documentElement.dataset.theme = t
+      }
+      applyTheme()
+      document.addEventListener("astro:after-swap", applyTheme)
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
