@@ -35,7 +35,7 @@ const sanityProjectId = getSanityProjectId()
 const sanityDataset = getSanityDataset()
 
 export default defineConfig({
-  site: "https://cartas.pages.dev", // placeholder — update when the real domain is set
+  site: "https://cartasparaumastronauta.pages.dev",
   output: "static",
   integrations: [
     sanity({
