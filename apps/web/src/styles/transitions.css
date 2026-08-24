@@ -1,0 +1,52 @@
+/* ── View Transition choreography ──
+   One consistent scene change everywhere: the old scene blurs away,
+   the new one develops underneath right behind it. */
+
+::view-transition-old(root) {
+  animation: vt-scene-out 0.3s var(--ease-swift) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-scene-in 0.55s var(--ease-expo) 0.08s both;
+}
+
+@keyframes vt-scene-out {
+  to {
+    opacity: 0;
+    filter: blur(14px);
+  }
+}
+
+@keyframes vt-scene-in {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+/* ── Theme switch: eclipse wipe ──
+   Scoped to [data-theme-transition] so page navigations keep their
+   blur choreography above. The new/old layers stack by direction:
+   to-light, the light layer wipes on top; to-dark, the dark layer
+   sits beneath while the light one collapses into the toggle. */
+
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-theme-transition="to-light"]::view-transition-new(root) {
+  z-index: 1;
+}
+
+html[data-theme-transition="to-dark"]::view-transition-old(root) {
+  z-index: 1;
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@cartas/adapter-sanity",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./schema/index.ts"
+  },
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "typegen": "sanity schema extract && sanity typegen generate"
+  },
+  "dependencies": {
+    "@cartas/domain": "workspace:*",
+    "@sanity/client": "^7.0.0",
+    "@sanity/icons": "^3.7.0",
+    "groq": "^3.84.0",
+    "sanity": "^6.7.0",
+    "sanity-plugin-asset-source-unsplash": "^7.0.21",
+    "styled-components": "^6.4.4",
+    "zod": "^4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

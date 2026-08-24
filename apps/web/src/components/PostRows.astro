@@ -1,0 +1,70 @@
+---
+import type { Post } from "@cartas/domain"
+import { img, coverSize, coverStyle, heroCover, formatDate } from "../lib/utils"
+
+interface Props {
+  posts: Post[]
+  startNumber: number
+  className?: string
+  showHead?: boolean
+}
+
+const { posts, startNumber, className, showHead = false } = Astro.props
+---
+
+<section class:list={["chapter", className]} aria-label="Todas as cartas">
+  {
+    showHead && (
+      <div class="chapter-head">
+        <h2>Cartas recebidas</h2>
+      </div>
+    )
+  }
+  <ul class="rows">
+    {
+      posts.map((post, i) => {
+        const isNewest = startNumber === 1 && i === 0
+        return (
+          <li class="row" data-reveal>
+            <a
+              href={`/${post.slug}`}
+              data-preview={post.cover ? img(post.cover, 840, post) : undefined}
+              data-hero={heroCover(post)}
+            >
+              <span class="mono row-idx">SIG {String(startNumber + i).padStart(3, "0")}</span>
+              <span class="row-main">
+                <span class="mono row-date">
+                  <span class:list={["row-dot", { "is-new": isNewest }]} aria-hidden="true" />
+                  <time datetime={post.date}>{formatDate(post.date)}</time>
+                </span>
+                <h3>{post.title}</h3>
+                {post.description && <p class="row-desc">{post.description}</p>}
+                {post.topics && post.topics.length > 0 && (
+                  <span class="mono row-topics">
+                    {post.topics.map((t) => (
+                      <span>{t}</span>
+                    ))}
+                  </span>
+                )}
+              </span>
+              {post.cover && (
+                <img
+                  class="row-thumb"
+                  src={img(post.cover, 336, post)}
+                  alt=""
+                  width={coverSize(post).width}
+                  height={coverSize(post).height}
+                  style={coverStyle(post)}
+                  loading="lazy"
+                />
+              )}
+              <span class="row-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        )
+      })
+    }
+  </ul>
+</section>

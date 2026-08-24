@@ -1,0 +1,30 @@
+---
+/* Search index is serialized by Base.astro into [data-search-index]. */
+---
+
+<div class="palette" data-palette hidden>
+  <div class="palette-veil" data-palette-close></div>
+  <div class="palette-panel" role="dialog" aria-modal="true" aria-label="Buscar cartas">
+    <div class="palette-inputrow">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5.25" stroke="currentColor" stroke-width="1.5"></circle>
+        <path d="M11 11L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+      </svg>
+      <input
+        data-palette-input
+        type="text"
+        placeholder="Buscar cartas, temas…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Buscar cartas"
+      />
+      <kbd>esc</kbd>
+    </div>
+    <ul class="palette-list" data-palette-list role="listbox" aria-label="Resultados"></ul>
+    <div class="palette-foot mono">
+      <span>↑↓ Navegar</span>
+      <span>↵ Abrir</span>
+      <span>esc Fechar</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,113 @@
+---
+import type { Post } from "@cartas/domain"
+import { img, coverSrcset, coverSize, coverStyle, heroCover, formatDate } from "../lib/utils"
+
+interface Props {
+  posts: Post[]
+}
+
+const { posts } = Astro.props
+const [main, sideA, sideB] = posts
+---
+
+<section class="chapter" aria-label="Cartas em destaque">
+  <div class="featured-grid">
+    {
+      main && (
+        <a
+          class="featured-main"
+          href={`/${main.slug}`}
+          data-hero={heroCover(main)}
+        >
+          <div class="featured-cover" data-parallax>
+            <p class="mono featured-tab" aria-hidden="true">Última transmissão</p>
+            {
+              main.cover ? (
+                <img
+                  src={img(main.cover, 640, main)}
+                  srcset={coverSrcset(main, [640, 900, 1200, 1600, 1920])}
+                  sizes="(max-width: 900px) 100vw, min(60vw, 910px)"
+                  alt=""
+                  width={coverSize(main).width}
+                  height={coverSize(main).height}
+                  style={coverStyle(main)}
+                  loading="eager"
+                  fetchpriority="high"
+                />
+              ) : (
+                <div class="cover-fallback" aria-hidden="true">
+                  {main.title.charAt(0)}
+                </div>
+              )
+            }
+          </div>
+          <div class="featured-body">
+            <p class="mono featured-meta">
+              <span>{formatDate(main.date)}</span>
+              {main.topics?.map((t) => <span>{t}</span>)}
+            </p>
+            <h3 data-reveal>{main.title}</h3>
+            {main.description && (
+              <p class="featured-desc" data-reveal>
+                {main.description}
+              </p>
+            )}
+            <span class="mono featured-read">
+              Ler carta <span class="arrow" aria-hidden="true">→</span>
+            </span>
+          </div>
+        </a>
+      )
+    }
+
+    <div class="featured-side">
+      {
+        [sideA, sideB]
+          .filter(Boolean)
+          .map((post) => (
+            <a
+              class="featured-side-item"
+              href={`/${post.slug}`}
+              data-hero={heroCover(post)}
+            >
+              <div class="featured-side-cover">
+                {
+                  post.cover ? (
+                    <img
+                      src={img(post.cover, 480, post)}
+                      srcset={coverSrcset(post, [480, 640, 800, 900, 1200, 1408])}
+                      sizes="(min-width: 900px) 40vw, 100vw"
+                      alt=""
+                      width={coverSize(post).width}
+                      height={coverSize(post).height}
+                      style={coverStyle(post)}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="cover-fallback" aria-hidden="true">
+                      {post.title.charAt(0)}
+                    </div>
+                  )
+                }
+              </div>
+              <div class="featured-side-body">
+                <p class="mono featured-side-meta">
+                  <span>{formatDate(post.date)}</span>
+                  {post.topics?.[0] && <span>{post.topics[0]}</span>}
+                </p>
+                <h3 data-reveal>{post.title}</h3>
+                {post.description && (
+                  <p class="featured-side-desc" data-reveal>
+                    {post.description}
+                  </p>
+                )}
+                <span class="mono featured-read">
+                  Ler carta <span class="arrow" aria-hidden="true">→</span>
+                </span>
+              </div>
+            </a>
+          ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,77 @@
+---
+import Lcd from "./Lcd.astro"
+
+interface Props {
+  pageTitle: string
+  tagline: string | null
+  topics: { slug: string; title: string }[]
+  activeTopic: string | null
+}
+
+const { pageTitle, tagline, topics, activeTopic } = Astro.props
+
+const titleChars = (() => {
+  let ki = 0
+  return pageTitle.split(" ").map((word) => word.split("").map((ch) => ({ ch, ki: ki++ })))
+})()
+---
+
+<section class="hero">
+  <svg class="hero-orbit" viewBox="0 0 900 900" fill="none" aria-hidden="true">
+    <circle cx="450" cy="450" r="440" stroke="currentColor" stroke-width="1" />
+    <circle cx="831" cy="230" r="4" fill="#b32029" />
+  </svg>
+
+  <div class="hero-astro" aria-hidden="true">
+    <img
+      src="/astronaut.svg"
+      alt=""
+      width="900"
+      height="1098"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <h1 class="hero-title" data-kinetic data-brand-title aria-label={pageTitle}>
+    {
+      titleChars.map((word, wi) => (
+        <>
+          {wi > 0 && " "}
+          <span class="kn-word" aria-hidden="true">
+            {word.map(({ ch, ki }) => (
+              <span class="kn-mask">
+                <span class:list={["kn-char", { accent: ch === "." }]} style={`--ki:${ki}`}>
+                  {ch}
+                </span>
+              </span>
+            ))}
+          </span>
+        </>
+      ))
+    }
+  </h1>
+
+  <div class="hero-foot">
+    <p class="hero-sub" data-reveal>
+      {tagline ?? "Crônicas sobre o agora e o depois — e o espaço entre os dois."}
+    </p>
+
+    <Lcd reveal />
+  </div>
+
+  <nav class="pills" aria-label="Filtrar por tema" data-reveal>
+    <a href="/" class:list={["pill", { active: !activeTopic }]}>Todos</a>
+    {
+      topics.map((topic) => (
+        <a
+          href={`/topic/${topic.slug}`}
+          class:list={["pill", { active: activeTopic === topic.slug }]}
+        >
+          {topic.title}
+        </a>
+      ))
+    }
+    <a href="/rss.xml" class="pill pill-rss">RSS</a>
+  </nav>
+</section>

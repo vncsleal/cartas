@@ -1,0 +1,64 @@
+/* ─────────────────────────────────────────────
+   CARTAS PARA UM ASTRONAUTA — Design Tokens
+   Light gray, dark gray, matte black.
+   Blood red is the only color that signals.
+   ───────────────────────────────────────────── */
+
+:root {
+  /* Color — "paper" is light gray, "ink" is dark gray, blood red signals */
+  --paper: #d4d4d4;
+  --paper-dim: #cbcbcb;
+  --key: #e3e3e3;
+  --key-hi: #ececec;
+  --ink: #242424;
+  --ink-soft: #525252;
+  --ink-mute: #8a8a8a;
+  --hairline: rgb(36 36 36 / 0.16);
+  --accent: #b32029; /* blood red */
+  --accent-deep: #8a151d;
+
+  /* Keycap material */
+  --key-border: rgb(36 36 36 / 0.12);
+  --key-inset: rgb(255 255 255 / 0.6);
+
+  /* Typography — Ovo carries display and reading; Space Mono is telemetry */
+  --font-display: "Ovo", Georgia, "Times New Roman", serif;
+  --font-sans: "Ovo", Georgia, "Times New Roman", serif;
+  --font-serif: "Ovo", Georgia, "Times New Roman", serif;
+  --font-mono: "Space Mono", ui-monospace, "SF Mono", monospace;
+
+  /* Metrics */
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --maxw: 1600px;
+  --topbar-h: 3.5rem;
+  --article-w: 42.5rem;
+
+  /* Motion */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-swift: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 0.2s;
+  --dur-2: 0.45s;
+  --dur-3: 0.9s;
+
+  /* Layers */
+  --z-topbar: 50;
+  --z-preview: 80;
+  --z-palette: 100;
+  --z-progress: 110;
+  --z-lightbox: 120;
+}
+
+/* ── Dark: matte black, dark gray surfaces, light gray type ── */
+
+:root[data-theme="dark"] {
+  --paper: #0f0f0f;
+  --paper-dim: #181818;
+  --key: #1a1a1a;
+  --key-hi: #232323;
+  --ink: #e6e6e6;
+  --ink-soft: #b3b3b3;
+  --ink-mute: #7d7d7d;
+  --hairline: rgb(230 230 230 / 0.14);
+  --key-border: rgb(230 230 230 / 0.10);
+  --key-inset: rgb(255 255 255 / 0.06);
+}

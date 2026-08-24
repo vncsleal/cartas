@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro"
+import { store } from "../adapters/sanity"
+
+const posts = (await store.getPosts()).slice(0, 3)
+const code = "404".split("")
+---
+
+<Base title="404 — Página não encontrada" noindex>
+  <main class="nf">
+    <p class="mono nf-kicker" data-reveal>Sinal perdido — transcrição da base</p>
+
+    <h1 class="nf-code" data-kinetic aria-label="404">
+      {
+        code.map((ch, i) => (
+          <span class="kn-mask" aria-hidden="true">
+            <span class="kn-char" style={`--ki:${i}`}>{ch}</span>
+          </span>
+        ))
+      }
+    </h1>
+
+    <blockquote class="nf-quote" data-reveal>
+      <p>
+        “Ground Control to Major Tom —<br />
+        your circuit’s dead, there’s something wrong.<br />
+        Can you hear me, Major Tom?”
+      </p>
+      <cite class="mono">Space Oddity — David Bowie, 1969</cite>
+    </blockquote>
+
+    <a class="mono nf-cta" href="/" data-reveal>Major Tom, volte às cartas →</a>
+
+    {
+      posts.length > 0 && (
+        <div class="nf-latest" data-reveal>
+          <span class="mono">Ou comece por estes</span>
+          {posts.map((post) => (
+            <a href={`/${post.slug}`}>{post.title}</a>
+          ))}
+        </div>
+      )
+    }
+  </main>
+</Base>

@@ -1,0 +1,491 @@
+/* ── Chrome: TopBar, Footer, shared bits ── */
+
+/* ── TopBar ── */
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-topbar);
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--gutter);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+  transition:
+    transform 0.4s var(--ease-swift),
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.topbar.is-scrolled {
+  border-bottom-color: var(--hairline);
+}
+
+.topbar.is-hidden {
+  transform: translateY(-100%);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  line-height: 1;
+  transition:
+    opacity 0.35s var(--ease-swift),
+    transform 0.35s var(--ease-swift),
+    color 0.2s ease;
+}
+
+.wordmark .accent {
+  color: var(--accent);
+}
+
+/* Yields to the huge page title; returns once it's scrolled past */
+.wordmark.is-off {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+.wordmark:hover {
+  color: var(--accent);
+}
+
+.topbar-side {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* ── Theme toggle ── */
+
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  color: var(--ink-soft);
+  border-radius: 8px;
+}
+
+.theme-btn:hover {
+  color: var(--ink);
+}
+
+.theme-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+:root[data-theme="dark"] .icon-sun {
+  display: none;
+}
+
+:root:not([data-theme="dark"]) .icon-moon {
+  display: none;
+}
+
+/* ── Signal readout ── */
+
+
+
+
+
+.search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--ink-soft);
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+}
+
+.search-btn:hover {
+  color: var(--ink);
+}
+
+.search-btn kbd {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--ink-mute);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 0.0625rem 0.3125rem;
+  transition: inherit;
+}
+
+.search-btn:hover kbd {
+  border-color: var(--ink-mute);
+  color: var(--ink);
+}
+
+/* ── Knob dial (search button icon) ── */
+
+.knob-dial {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background:
+    radial-gradient(circle at 50% 42%, #4a4948 0%, #2b2b2a 62%, #1d1d1c 100%);
+  position: relative;
+  transition: transform 0.45s var(--ease-expo);
+  flex-shrink: 0;
+}
+
+.knob-dial::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgb(255 255 255 / 0.14) 0deg,
+    transparent 30deg,
+    rgb(255 255 255 / 0.14) 60deg,
+    transparent 90deg,
+    rgb(255 255 255 / 0.14) 120deg,
+    transparent 150deg,
+    rgb(255 255 255 / 0.14) 180deg,
+    transparent 210deg,
+    rgb(255 255 255 / 0.14) 240deg,
+    transparent 270deg,
+    rgb(255 255 255 / 0.14) 300deg,
+    transparent 330deg,
+    rgb(255 255 255 / 0.14) 360deg
+  );
+}
+
+.knob-dial::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.search-btn:hover .knob-dial {
+  transform: rotate(140deg);
+}
+
+/* ── Pills (topic filters) ── */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+.pill.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.pill-rss {
+  margin-left: auto;
+  color: var(--ink-mute);
+}
+
+/* ── Chapter markers ── */
+
+.chapter {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.chapter + .chapter {
+  margin-top: clamp(3rem, 7vh, 5rem);
+}
+
+.chapter-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  color: var(--ink-mute);
+  margin: clamp(4rem, 9vh, 7rem) 0 clamp(1.75rem, 4vh, 3rem);
+}
+
+/* The rule continues into the grid — a measured coordinate reference */
+.chapter-head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.chapter-head h2 {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--ink);
+}
+
+/* ── Footer ── */
+
+.footer {
+  margin-top: auto;
+  padding: clamp(3rem, 7vh, 5rem) var(--gutter) 0;
+  overflow: hidden;
+}
+
+
+.footer-grid {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+  position: relative;
+  padding: 1.25rem;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.footer-grid:hover {
+  background: var(--paper-dim);
+}
+
+.footer-grid:hover .footer-name {
+  color: var(--accent);
+}
+
+.footer-author {
+  flex: 1;
+  min-width: min(100%, 34rem);
+  position: relative;
+}
+
+.footer-author::after {
+  content: "→";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  color: var(--accent);
+  opacity: 0;
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s var(--ease-expo);
+}
+
+.footer-grid:hover .footer-author::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.footer-author-link {
+  display: flex;
+  gap: 1.5rem;
+  text-decoration: none;
+}
+
+.footer-photo {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.footer-kicker {
+  color: var(--ink-mute);
+  margin-bottom: 0.5rem;
+}
+
+.footer-name {
+  font-family: var(--font-display);
+  font-variation-settings: "wght" 700, "wdth" 110;
+  font-size: 1.375rem;
+  line-height: 1.15;
+  transition: color 0.2s ease;
+}
+
+.footer-bio {
+  margin-top: 0.625rem;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 46ch;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.footer-links a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--ink);
+}
+
+.footer-word-row {
+  max-width: var(--maxw);
+  margin: clamp(2.5rem, 6vh, 4.5rem) auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.footer-word {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 15vw, 14rem);
+  line-height: 0.78;
+  letter-spacing: -0.02em;
+  color: var(--paper-dim);
+  -webkit-text-stroke: 1px var(--hairline);
+  user-select: none;
+  white-space: nowrap;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+
+.footer-word .accent {
+  color: var(--accent);
+  -webkit-text-stroke: 0;
+}
+
+/* ── Spinning ring (credit line) ── */
+
+.footer-spin-section {
+  flex-shrink: 0;
+  /* line-height 0.78 no VNCS empurra o glifo 0.11em pra baixo do box —
+     desloca o anel o mesmo tanto pra alinhar com o texto visível */
+  transform: translateY(calc(clamp(3.5rem, 15vw, 14rem) * 0.11));
+}
+
+.spin-ring-wrap {
+  position: relative;
+  display: inline-block;
+  width: clamp(200px, 24vw, 264px);
+  height: clamp(200px, 24vw, 264px);
+  border-radius: 50%;
+}
+
+.spin-ring {
+  position: absolute;
+  inset: 0;
+  animation: spin-ring 22s linear infinite;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  color: var(--ink-mute);
+  --spin-radius: 13;
+}
+
+.spin-letter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-block;
+  transform: translate(-50%, -50%)
+    rotate(calc(360deg / var(--total) * var(--i)))
+    translateY(calc(var(--spin-radius, 11) * -1ch));
+}
+
+.spin-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(72px, 8vw, 100px);
+  height: clamp(72px, 8vw, 100px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@keyframes spin-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-ring {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-word-row {
+    flex-direction: column;
+    gap: clamp(2rem, 8vw, 4rem);
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: 0;
+  }
+
+  .footer-word {
+    text-align: center;
+    font-size: 24vw;
+    width: 100%;
+  }
+
+  .footer-spin-section {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spin-ring-wrap {
+    width: clamp(240px, 60vw, 320px);
+    height: clamp(240px, 60vw, 320px);
+  }
+
+  .spin-ring {
+    font-size: 0.65rem;
+    --spin-radius: 16;
+  }
+
+  .spin-logo {
+    width: clamp(96px, 24vw, 128px);
+    height: clamp(96px, 24vw, 128px);
+  }
+}
+
+@media (max-width: 700px) {
+  .footer-links {
+    flex-direction: row;
+    text-align: left;
+    gap: 1.25rem;
+  }
+}

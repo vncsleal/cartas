@@ -1,0 +1,184 @@
+---
+import Base from "../layouts/Base.astro"
+import Lightbox from "../components/Lightbox.astro"
+import Blocks from "../components/Blocks.astro"
+import Lcd from "../components/Lcd.astro"
+import { store } from "../adapters/sanity"
+import { compilePost } from "@cartas/artifacts"
+import { img, coverSrcset, coverSize, coverStyle, heroCover, ogImage, absolute, formatDate, readingTime } from "../lib/utils"
+
+export async function getStaticPaths() {
+  const posts = await store.getPosts()
+  return posts.map((post) => ({ params: { slug: post.slug } }))
+}
+
+const { slug } = Astro.params
+
+const [postData, authorData, allPosts] = await Promise.all([
+  store.getPost(slug!),
+  store.getAuthor(),
+  store.getPosts(),
+])
+
+if (!postData) {
+  return Astro.redirect("/404")
+}
+
+const { post, author } = compilePost(postData, authorData)
+
+const blocks: any[] = Array.isArray(post.body) ? post.body : []
+const minutes = readingTime(blocks)
+
+const currentIndex = allPosts.findIndex((p) => p.slug === slug)
+const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
+const olderPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
+const nextStory = olderPost ?? newerPost
+
+const titleChars = (() => {
+  let ki = 0
+  return post.title.split(" ").map((word) => word.split("").map((ch) => ({ ch, ki: ki++ })))
+})()
+
+const shareImage = ogImage(post)
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  image: shareImage,
+  datePublished: post.date,
+  dateModified: post.date,
+  keywords: post.topics,
+  author: author ? { "@type": "Person", name: author.name, url: absolute("/autor") } : undefined,
+  publisher: { "@type": "Organization", name: "Cartas para um Astronauta" },
+  mainEntityOfPage: absolute(`/${post.slug}/`),
+}
+---
+
+<Base
+  title={post.title}
+  description={post.description}
+  ogImage={shareImage}
+  type="article"
+  article={{ publishedTime: post.date, author: author?.name, tags: post.topics }}
+  jsonLd={jsonLd}
+>
+  <article class="article">
+    <div class="a-cover">
+      <div class="a-cover-frame" data-parallax>
+        {
+          post.cover ? (
+            <img
+              src={img(post.cover, 640, post)}
+              srcset={coverSrcset(post, [640, 1024, 1408, 1920, 2560, 3200])}
+              sizes="100vw"
+              alt=""
+              width={coverSize(post).width}
+              height={coverSize(post).height}
+              style={coverStyle(post)}
+              loading="eager"
+              fetchpriority="high"
+            />
+          ) : (
+            <div class="cover-fallback" aria-hidden="true">
+              {post.title.charAt(0)}
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <header class="a-hero">
+      <Lcd mode="letter" />
+      <div class="mono a-strip" data-reveal>
+        <span>Carta Nº {String(allPosts.length - currentIndex).padStart(2, "0")}</span>
+        <span>{post.date.split("-").reverse().join(".")}</span>
+        <span>Órbita baixa</span>
+        {author && <span>{author.name}</span>}
+        <span>{minutes} min de leitura</span>
+      </div>
+
+      <h1 class="a-title" data-kinetic aria-label={post.title}>
+        {
+          titleChars.map((word, wi) => (
+            <>
+              {wi > 0 && " "}
+              <span class="kn-word" aria-hidden="true">
+                {word.map(({ ch, ki }) => (
+                  <span class="kn-mask">
+                    <span class="kn-char" style={`--ki:${ki}`}>{ch}</span>
+                  </span>
+                ))}
+              </span>
+            </>
+          ))
+        }
+      </h1>
+
+      {post.description && <p class="a-lede" data-reveal>{post.description}</p>}
+    </header>
+
+    <div class="a-body">
+      <Blocks blocks={blocks} dropcap />
+    </div>
+
+    <footer class="a-foot">
+      {
+        post.topics && post.topics.length > 0 && (
+          <div class="a-tags">
+            {post.topics.map((topic) => (
+              <a class="pill" href={`/topic/${topic}`}>
+                {topic}
+              </a>
+            ))}
+          </div>
+        )
+      }
+
+      <nav class="mono a-nav" aria-label="Mais cartas">
+        {newerPost ? <a href={`/${newerPost.slug}`}>← Mais recente</a> : <span />}
+        <a href="/" class="all">Todas as cartas</a>
+        {olderPost ? <a href={`/${olderPost.slug}`}>Mais antigo →</a> : <span />}
+      </nav>
+    </footer>
+  </article>
+
+  {
+    nextStory && (
+      <section class="next-story">
+        <a
+          href={`/${nextStory.slug}`}
+          data-hero={heroCover(nextStory)}
+        >
+          <p class="mono next-kicker">Próxima carta</p>
+          <div class="next-body">
+            <div>
+              <h2 class="next-title">{nextStory.title}</h2>
+              <p class="mono next-date">
+                {formatDate(nextStory.date)}
+                <span class="arrow" aria-hidden="true">→</span>
+              </p>
+            </div>
+            {nextStory.cover && (
+              <div class="next-cover">
+                <img
+                  src={img(nextStory.cover, 480, nextStory)}
+                  srcset={coverSrcset(nextStory, [480, 768, 960, 1440])}
+                  sizes="(max-width: 800px) 100vw, 26rem"
+                  alt=""
+                  width={coverSize(nextStory).width}
+                  height={coverSize(nextStory).height}
+                  style={coverStyle(nextStory)}
+                  loading="lazy"
+                />
+              </div>
+            )}
+          </div>
+        </a>
+      </section>
+    )
+  }
+
+  <Lightbox />
+</Base>

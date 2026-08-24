@@ -1,0 +1,72 @@
+---
+import Base from "../../layouts/Base.astro"
+import HomeHero from "../../components/HomeHero.astro"
+import FeaturedPost from "../../components/FeaturedPost.astro"
+import PostRows from "../../components/PostRows.astro"
+import { store } from "../../adapters/sanity"
+import { compileBlog } from "@cartas/artifacts"
+
+export async function getStaticPaths() {
+  const [posts, allTopics] = await Promise.all([store.getPosts(), store.getTopics()])
+  const usedSlugs = new Set(posts.flatMap((p) => p.topics ?? []))
+  return allTopics
+    .filter((t) => usedSlugs.has(t.slug))
+    .map((t) => ({ params: { topic: t.slug } }))
+}
+
+const { topic } = Astro.params
+
+const [posts, blog, allTopics] = await Promise.all([
+  store.getPosts(),
+  store.getBlog(),
+  store.getTopics(),
+])
+
+const filtered = posts.filter((p) => p.topics?.includes(topic!))
+const page = compileBlog(filtered, blog)
+
+const usedSlugs = new Set(posts.flatMap((p) => p.topics ?? []))
+const topics = allTopics.filter((t) => usedSlugs.has(t.slug))
+const activeTopic = topics.find((t) => t.slug === topic) ?? null
+
+const [main, sideA, sideB, ...rest] = page.posts
+const featured = [main, sideA, sideB].filter(Boolean)
+---
+
+<Base
+  title={page.seoTitle ?? null}
+  description={page.seoDescription ?? activeTopic?.description ?? page.tagline ?? undefined}
+>
+  <main class="home">
+    <HomeHero
+      pageTitle={page.pageTitle}
+      tagline={activeTopic?.description ?? page.tagline}
+      topics={topics}
+      activeTopic={topic!}
+    />
+
+    {
+      featured.length > 0 && (
+        <FeaturedPost posts={featured} />
+      )
+    }
+
+    {
+      [sideA, sideB].filter(Boolean).length > 0 && (
+        <PostRows posts={[sideA, sideB].filter(Boolean)} startNumber={2} className="mobile-only" />
+      )
+    }
+
+    {
+      rest.length > 0 && (
+        <PostRows posts={rest} startNumber={4} />
+      )
+    }
+
+    {
+      page.posts.length === 0 && (
+        <p class="empty">{page.emptyState ?? "Nada publicado por aqui ainda."}</p>
+      )
+    }
+  </main>
+</Base>

@@ -1,0 +1,28 @@
+---
+interface Props {
+  text?: string
+  href?: string
+}
+
+const { text = "DESENVOLVIDO POR IAMVINI.CO · DESENVOLVIDO POR IAMVINI.CO · ", href = "https://iamvini.co" } = Astro.props
+const letters = text.split("")
+---
+
+<a
+  class="spin-ring-wrap"
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={`Desenvolvido por iamvini.co — ${href}`}
+>
+  <span class="spin-ring" style={`--total:${letters.length}`} aria-hidden="true">
+    {
+      letters.map((letter, i) => (
+        <span class="spin-letter" style={`--i:${i}`}>
+          {letter === " " ? "\u00A0" : letter}
+        </span>
+      ))
+    }
+  </span>
+  <img class="spin-logo" src="/iamvinico.png" alt="" loading="lazy" />
+</a>

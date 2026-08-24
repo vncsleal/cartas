@@ -1,0 +1,29 @@
+---
+interface Props {
+  current: number
+  totalPages: number
+}
+
+const { current, totalPages } = Astro.props
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+
+const pageHref = (p: number) => (p === 1 ? "/" : `/page/${p}`)
+---
+
+<nav class="pagination" aria-label="Paginação">
+  <ul class="pagination-pages">
+    {
+      pages.map((p) => (
+        <li>
+          <a
+            href={pageHref(p)}
+            class:list={["pagination-link mono", { active: p === current }]}
+            aria-current={p === current ? "page" : undefined}
+          >
+            {p}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

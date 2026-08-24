@@ -1,0 +1,76 @@
+---
+import Base from "../layouts/Base.astro"
+import HomeHero from "../components/HomeHero.astro"
+import FeaturedPost from "../components/FeaturedPost.astro"
+import PostRows from "../components/PostRows.astro"
+import Pagination from "../components/Pagination.astro"
+import { store } from "../adapters/sanity"
+import { compileBlog } from "@cartas/artifacts"
+import { ogImage } from "../lib/utils"
+
+const PER_PAGE = 8
+
+const [posts, blog, allTopics] = await Promise.all([
+  store.getPosts(),
+  store.getBlog(),
+  store.getTopics(),
+])
+
+const page = compileBlog(posts, blog)
+
+const usedSlugs = new Set(posts.flatMap((p) => p.topics ?? []))
+const topics = allTopics.filter((t) => usedSlugs.has(t.slug))
+
+const [main, sideA, sideB, ...rest] = page.posts
+const featured = [main, sideA, sideB].filter(Boolean)
+
+// A página 1 mostra 3 destaques + (PER_PAGE - 3) na lista
+const listPosts = rest.slice(0, PER_PAGE - 3)
+const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE))
+---
+
+<Base
+  title={page.seoTitle ?? null}
+  description={page.seoDescription ?? page.tagline ?? undefined}
+  ogImage={posts[0] ? ogImage(posts[0]) : undefined}
+>
+  <main class="home">
+    <HomeHero
+      pageTitle={page.pageTitle}
+      tagline={page.tagline}
+      topics={topics}
+      activeTopic={null}
+    />
+
+    {
+      featured.length > 0 && (
+        <FeaturedPost posts={featured} />
+      )
+    }
+
+    {
+      // Mobile: os destaques da direita viram linhas da lista (posts 2 e 3)
+      [sideA, sideB].filter(Boolean).length > 0 && (
+        <PostRows posts={[sideA, sideB].filter(Boolean)} startNumber={2} className="mobile-only" />
+      )
+    }
+
+    {
+      listPosts.length > 0 && (
+        <PostRows posts={listPosts} startNumber={4} showHead />
+      )
+    }
+
+    {
+      page.posts.length === 0 && (
+          <p class="empty">{page.emptyState ?? "O rádio está em silêncio — nenhuma carta foi enviada ainda."}</p>
+      )
+    }
+
+    {
+      totalPages > 1 && (
+        <Pagination current={1} totalPages={totalPages} />
+      )
+    }
+  </main>
+</Base>

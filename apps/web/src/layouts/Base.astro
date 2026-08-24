@@ -1,0 +1,132 @@
+---
+import "../styles/global.css"
+import { ClientRouter } from "astro:transitions"
+import { store } from "../adapters/sanity"
+import { absolute } from "../lib/utils"
+import TopBar from "../components/TopBar.astro"
+import Footer from "../components/Footer.astro"
+import CommandPalette from "../components/CommandPalette.astro"
+import CursorPreview from "../components/CursorPreview.astro"
+
+interface Props {
+  title?: string | null
+  description?: string | null
+  ogImage?: string | null
+  type?: "website" | "article"
+  article?: {
+    publishedTime: string
+    author?: string
+    tags?: string[]
+  } | null
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+  noindex?: boolean
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  type = "website",
+  article = null,
+  jsonLd,
+  noindex = false,
+} = Astro.props
+
+const [posts, topics, author, blog] = await Promise.all([
+  store.getPosts(),
+  store.getTopics(),
+  store.getAuthor(),
+  store.getBlog(),
+])
+
+const siteTitle = blog?.pageTitle ?? "Cartas."
+const pageTitle = title
+  ? title.toLowerCase().includes(siteTitle.toLowerCase())
+    ? title
+    : `${title} — ${siteTitle}`
+  : siteTitle
+
+const pathname = Astro.url.pathname === "/" ? "/" : `${Astro.url.pathname.replace(/\/+$/, "")}/`
+const canonical = absolute(pathname)
+
+const webSiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteTitle,
+  url: absolute("/"),
+}
+
+const searchIndex = {
+  posts: posts.map((p) => ({
+    s: p.slug,
+    t: p.title,
+    d: p.date,
+    x: p.description ?? "",
+    g: p.topics ?? [],
+  })),
+  topics: topics.map((t) => ({ s: t.slug, t: t.title })),
+}
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ClientRouter />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description ?? pageTitle} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:type" content={type} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {!ogImage && <meta property="og:image" content={absolute("/og.png")} />}
+    {article && (
+      <>
+        <meta property="article:published_time" content={article.publishedTime} />
+        {article.author && <meta property="article:author" content={article.author} />}
+        {article.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+      </>
+    )}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage ?? absolute("/og.png")} />
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLd ?? webSiteLd).replace(/</g, "\\u003c")}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+    <script is:inline>
+      // Theme boot — runs before paint to avoid flashes.
+      const t =
+        localStorage.getItem("theme") ??
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      document.documentElement.dataset.theme = t
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ovo&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <TopBar siteTitle={siteTitle} />
+    <slot />
+    <Footer author={author} siteTitle={siteTitle} word="Cartas." />
+    <CommandPalette />
+    <CursorPreview />
+    <script is:inline type="application/json" data-search-index set:html={JSON.stringify(searchIndex)} />
+    <script>
+      import "../scripts/app"
+    </script>
+  </body>
+</html>

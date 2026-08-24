@@ -1,0 +1,63 @@
+---
+import { img, srcset } from "../lib/utils"
+import { renderChildren } from "../lib/render"
+
+interface Props {
+  blocks: any[]
+  dropcap?: boolean
+}
+
+const { blocks, dropcap = false } = Astro.props
+const firstTextIdx = blocks.findIndex((b) => b._type !== "image")
+let figCount = 0
+
+const figureAttrs = (block: any) => {
+  const intrinsic = block.dimensions?.width
+  const widths = [680, 1024, 1360, 1800].filter((w) => !intrinsic || w <= intrinsic)
+  return {
+    src: img(block.url, intrinsic ? Math.min(1360, intrinsic) : 1360),
+    srcset: widths.length > 0 ? srcset(block.url, widths) : undefined,
+    fullWidth: intrinsic ?? undefined,
+  }
+}
+---
+
+{
+  blocks.map((block, bi) => {
+    if (block._type === "image" && block.url) {
+      const attrs = figureAttrs(block)
+      figCount++
+      return (
+        <figure class="a-figure" data-reveal>
+          <img
+            src={attrs.src}
+            srcset={attrs.srcset}
+            sizes="(max-width: 700px) 100vw, 680px"
+            alt=""
+            loading="lazy"
+            data-lightbox
+            data-full-width={attrs.fullWidth}
+          />
+          <figcaption class="mono a-figcap">
+            Fig. {String(figCount).padStart(2, "0")} — transmissão recebida
+          </figcaption>
+        </figure>
+      )
+    }
+    const html = renderChildren(block.children, block.markDefs)
+    if (block.style === "h2") {
+      return <h2 data-reveal set:html={html} />
+    }
+    if (block.style === "h3") {
+      return <h3 data-reveal set:html={html} />
+    }
+    if (block.style === "blockquote") {
+      return (
+        <blockquote data-reveal>
+          <p set:html={html} />
+        </blockquote>
+      )
+    }
+    return <p class:list={[{ dropcap: dropcap && bi === firstTextIdx }]} set:html={html} />
+  })
+}

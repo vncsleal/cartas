@@ -1,0 +1,287 @@
+/* ── Reset & Base ── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  background: var(--paper);
+}
+
+/* Lenis smooth-scroll compatibility */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Speckle ──
+   The anodized-aluminum speckle from the frame, as two fixed layers of
+   tiled graphite dots over the studio backdrop. Static, behind content. */
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::before {
+  background-image:
+    radial-gradient(1px 1px at 22% 18%, rgb(43 43 42 / 0.07) 50%, transparent 51%),
+    radial-gradient(1px 1px at 68% 42%, rgb(43 43 42 / 0.05) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 76%, rgb(43 43 42 / 0.06) 50%, transparent 51%),
+    radial-gradient(1px 1px at 41% 88%, rgb(43 43 42 / 0.05) 50%, transparent 51%),
+    radial-gradient(1px 1px at 9% 55%, rgb(43 43 42 / 0.06) 50%, transparent 51%);
+  background-size: 560px 560px;
+}
+
+body::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 30% 30%, rgb(179 32 41 / 0.16) 50%, transparent 51%),
+    radial-gradient(1px 1px at 76% 64%, rgb(43 43 42 / 0.08) 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 12%, rgb(43 43 42 / 0.07) 50%, transparent 51%);
+  background-size: 720px 720px;
+}
+
+/* Dark: speckle becomes starlight */
+:root[data-theme="dark"] body::before {
+  background-image:
+    radial-gradient(1px 1px at 22% 18%, rgb(230 230 230 / 0.20) 50%, transparent 51%),
+    radial-gradient(1px 1px at 68% 42%, rgb(230 230 230 / 0.15) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 76%, rgb(230 230 230 / 0.18) 50%, transparent 51%),
+    radial-gradient(1px 1px at 41% 88%, rgb(230 230 230 / 0.13) 50%, transparent 51%),
+    radial-gradient(1px 1px at 9% 55%, rgb(230 230 230 / 0.17) 50%, transparent 51%);
+}
+
+:root[data-theme="dark"] body::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 30% 30%, rgb(179 32 41 / 0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 76% 64%, rgb(230 230 230 / 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 12%, rgb(230 230 230 / 0.45) 50%, transparent 51%);
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* Ovo is a single-weight face — any heavier weight would be synthesized
+   (faux bold re-paints glyphs offset, reading as doubled letters). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong {
+  font-weight: 400;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+  border: 3px solid var(--paper);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink) 18%, transparent) var(--paper);
+}
+
+/* Mono utility — lowercase legends, like keycap silkscreen */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+/* ── Keycap ──
+   Shared tactile surface: soft top-light gradient, tight border,
+   layered shadow. Hover lifts, active presses like a switch. */
+
+.key,
+.pill,
+.search-btn,
+.nf-cta,
+.pagination-link {
+  background: linear-gradient(180deg, var(--key-hi) 0%, var(--key) 100%);
+  border: 1px solid var(--key-border);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgb(20 20 19 / 0.10),
+    0 3px 8px rgb(20 20 19 / 0.07),
+    inset 0 1px 0 var(--key-inset);
+  transition:
+    transform 0.15s var(--ease-swift),
+    box-shadow 0.15s var(--ease-swift),
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.25s ease;
+}
+
+.key:hover,
+.pill:hover,
+.search-btn:hover,
+.nf-cta:hover,
+.pagination-link:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgb(20 20 19 / 0.12),
+    0 6px 14px rgb(20 20 19 / 0.10),
+    inset 0 1px 0 rgb(255 255 255 / 0.65);
+}
+
+.key:active,
+.pill:active,
+.search-btn:active,
+.nf-cta:active,
+.pagination-link:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgb(20 20 19 / 0.14),
+    inset 0 2px 4px rgb(20 20 19 / 0.10);
+}
+
+/* ── Scroll reveal system ── */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s var(--ease-expo),
+    transform 0.8s var(--ease-expo);
+  transition-delay: var(--rd, 0ms);
+}
+
+/* ── Kinetic type ── */
+
+.kn-word {
+  display: inline-block;
+}
+
+.kn-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em; /* descender room */
+  margin-bottom: -0.08em;
+}
+
+.kn-char {
+  display: inline-block;
+  transform: translateY(115%);
+  will-change: transform;
+}
+
+.kn-char.accent {
+  color: var(--accent);
+}
+
+[data-kinetic].is-in .kn-char {
+  transform: translateY(0);
+  transition: transform 1s var(--ease-expo);
+  transition-delay: calc(var(--ki, 0) * 45ms);
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-reveal],
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .kn-char,
+  [data-kinetic].is-in .kn-char {
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

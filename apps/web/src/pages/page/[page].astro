@@ -1,0 +1,61 @@
+---
+import Base from "../../layouts/Base.astro"
+import HomeHero from "../../components/HomeHero.astro"
+import PostRows from "../../components/PostRows.astro"
+import Pagination from "../../components/Pagination.astro"
+import { store } from "../../adapters/sanity"
+import { compileBlog } from "@cartas/artifacts"
+
+export async function getStaticPaths() {
+  const PER_PAGE = 8
+  const posts = await store.getPosts()
+  const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE))
+  return Array.from({ length: totalPages - 1 }, (_, i) => ({
+    params: { page: String(i + 2) },
+  }))
+}
+
+const { page: pageParam } = Astro.params
+const current = Number(pageParam)
+
+if (current < 2) {
+  return Astro.redirect("/")
+}
+
+const PER_PAGE = 8
+
+const [posts, blog, allTopics] = await Promise.all([
+  store.getPosts(),
+  store.getBlog(),
+  store.getTopics(),
+])
+
+const page = compileBlog(posts, blog)
+
+const usedSlugs = new Set(posts.flatMap((p) => p.topics ?? []))
+const topics = allTopics.filter((t) => usedSlugs.has(t.slug))
+
+const startIdx = (current - 1) * PER_PAGE
+const listPosts = posts.slice(startIdx, startIdx + PER_PAGE)
+const startNumber = (current - 1) * PER_PAGE + 1
+const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE))
+---
+
+<Base title={page.seoTitle ?? null} description={page.seoDescription}>
+  <main class="home">
+    <HomeHero
+      pageTitle={page.pageTitle}
+      tagline={page.tagline}
+      topics={topics}
+      activeTopic={null}
+    />
+
+    {
+      listPosts.length > 0 && (
+        <PostRows posts={listPosts} startNumber={startNumber} />
+      )
+    }
+
+    <Pagination current={current} totalPages={totalPages} />
+  </main>
+</Base>

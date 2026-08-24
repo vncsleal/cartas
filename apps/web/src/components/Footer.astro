@@ -1,0 +1,57 @@
+---
+import type { Author } from "@cartas/domain"
+import SpinningRing from "./SpinningRing.astro"
+
+interface Props {
+  author: Author | null
+  siteTitle: string
+  word?: string
+}
+
+const { author, siteTitle, word = siteTitle } = Astro.props
+---
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-author">
+      <a class="footer-author-link" href="/autor" aria-label={`Página do autor — ${author?.name ?? "O Autor"}`}>
+        {
+          author?.photo && (
+            <img
+              class="footer-photo"
+              src={`${author.photo}?w=144&h=144&fit=crop&auto=format`}
+              alt={author.name}
+              width="72"
+              height="72"
+              loading="lazy"
+            />
+          )
+        }
+        <div>
+          <p class="mono footer-kicker">Sobre o autor</p>
+          <p class="footer-name">{author?.name ?? "O Autor"}</p>
+          {author?.tagline && <p class="footer-bio">{author.tagline}</p>}
+        </div>
+      </a>
+    </div>
+    <nav class="footer-links mono" aria-label="Rodapé">
+      <a href="/">Cartas</a>
+      <a href="/autor">Autor</a>
+      <a href="/rss.xml">RSS</a>
+      <a href="/sitemap.xml">Sitemap</a>
+    </nav>
+  </div>
+
+  <div class="footer-word-row">
+    <div class="footer-word" aria-hidden="true">
+      {
+        word
+          .split("")
+          .map((ch) => (ch === "." ? <span class="accent">.</span> : ch))
+      }
+    </div>
+    <div class="footer-spin-section">
+      <SpinningRing />
+    </div>
+  </div>
+</footer>

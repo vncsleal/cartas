@@ -1,0 +1,35 @@
+---
+interface Props {
+  mode?: "station" | "letter"
+  reveal?: boolean
+}
+
+const { mode = "station", reveal = false } = Astro.props
+const segments = Array.from({ length: 10 })
+---
+
+<div
+  class:list={["lcd", { "lcd--letter": mode === "letter" }]}
+  data-reveal={reveal || undefined}
+  aria-hidden="true"
+>
+  <div class="lcd-screen">
+    {
+      mode === "station" ? (
+        <>
+          <p class="lcd-time" data-lcd-time>
+            --:--
+          </p>
+          <p class="lcd-date" data-today>—</p>
+        </>
+      ) : (
+        <>
+          <p class="lcd-time" data-letter-pct>0%</p>
+          <div class="lcd-progress" data-letter-progress>
+            {segments.map(() => <i />)}
+          </div>
+        </>
+      )
+    }
+  </div>
+</div>

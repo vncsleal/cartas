@@ -1,0 +1,147 @@
+---
+import Base from "../layouts/Base.astro"
+import Blocks from "../components/Blocks.astro"
+import { store } from "../adapters/sanity"
+import { img, cappedSrcset, coverSize, coverStyle, heroCover, formatDate, absolute } from "../lib/utils"
+
+const [author, posts] = await Promise.all([store.getAuthor(), store.getPosts()])
+
+if (!author) {
+  return Astro.redirect("/404")
+}
+
+const blocks: any[] = Array.isArray(author.body) ? author.body : []
+const nameChars = (() => {
+  let ki = 0
+  return author.name.split(" ").map((word) => word.split("").map((ch) => ({ ch, ki: ki++ })))
+})()
+
+const socialUrls = Object.values(author.social ?? {}).filter(Boolean)
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: author.name,
+  url: absolute("/autor"),
+  image: author.photo ? img(author.photo, 640) : undefined,
+  description: author.tagline,
+  address: author.location
+    ? { "@type": "PostalAddress", addressLocality: author.location }
+    : undefined,
+  sameAs: socialUrls.length > 0 ? socialUrls : undefined,
+}
+---
+
+<Base title={author.name} description={author.tagline} jsonLd={jsonLd}>
+  <main class="author">
+    <header class="au-hero">
+      <p class="mono au-kicker" data-reveal>O autor</p>
+
+      <h1 class="au-name" data-kinetic aria-label={author.name}>
+        {
+          nameChars.map((word, wi) => (
+            <>
+              {wi > 0 && " "}
+              <span class="kn-word" aria-hidden="true">
+                {word.map(({ ch, ki }) => (
+                  <span class="kn-mask">
+                    <span class="kn-char" style={`--ki:${ki}`}>{ch}</span>
+                  </span>
+                ))}
+              </span>
+            </>
+          ))
+        }
+      </h1>
+
+      {author.tagline && <p class="au-tagline" data-reveal>{author.tagline}</p>}
+
+      <div class="mono au-meta" data-reveal>
+        {author.location && <span>{author.location}</span>}
+      </div>
+    </header>
+
+    <section class="chapter" aria-label="Sobre o autor">
+      <div class="chapter-head">
+        <h2>Sobre</h2>
+      </div>
+
+      <div class="au-grid">
+        <div class="au-portrait" data-reveal>
+          {
+            author.photo ? (
+              <img
+                src={img(author.photo, 640)}
+                srcset={cappedSrcset(author.photo, [440, 640, 880, 1121], author.photoWidth)}
+                sizes="20rem"
+                alt={author.name}
+                width={author.photoWidth}
+                height={author.photoHeight}
+                loading="eager"
+              />
+            ) : (
+              <div class="au-monogram" aria-hidden="true">
+                V<span class="accent">.</span>
+              </div>
+            )
+          }
+        </div>
+
+        <div class="a-body au-body">
+          <Blocks blocks={blocks} />
+        </div>
+      </div>
+    </section>
+
+    {
+      posts.length > 0 && (
+    <section class="chapter" aria-label="Cartas do autor">
+      <div class="chapter-head">
+        <h2>Cartas</h2>
+      </div>
+          <ul class="rows">
+            {posts.map((post, i) => (
+              <li class="row" data-reveal>
+                <a
+                  href={`/${post.slug}`}
+                  data-preview={post.cover ? img(post.cover, 840, post) : undefined}
+                  data-hero={heroCover(post)}
+                >
+                  <span class="mono row-idx">{String(i + 1).padStart(2, "0")}</span>
+                  <span class="row-main">
+                    <time class="mono row-date" datetime={post.date}>
+                      {formatDate(post.date)}
+                    </time>
+                    <h3>{post.title}</h3>
+                    {post.description && <p class="row-desc">{post.description}</p>}
+                    {post.topics && post.topics.length > 0 && (
+                      <span class="mono row-topics">
+                        {post.topics.map((t) => (
+                          <span>{t}</span>
+                        ))}
+                      </span>
+                    )}
+                  </span>
+                  {post.cover && (
+                    <img
+                      class="row-thumb"
+                      src={img(post.cover, 336, post)}
+                      alt=""
+                      width={coverSize(post).width}
+                      height={coverSize(post).height}
+                      style={coverStyle(post)}
+                      loading="lazy"
+                    />
+                  )}
+                  <span class="row-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </main>
+</Base>
