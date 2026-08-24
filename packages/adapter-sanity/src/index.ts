@@ -31,7 +31,7 @@ const coverFields = `"cover": cover.asset->url,
   "coverCrop": cover.crop,
   "coverHotspot": cover.hotspot`
 
-const authorQuery = `*[_type == "author" && defined(slug.current)][0]{
+const authorQuery = `*[_type == "author" && defined(slug.current) && !(_id in path("drafts.**"))][0]{
   name,
   "slug": slug.current,
   email,
@@ -60,7 +60,7 @@ const authorQuery = `*[_type == "author" && defined(slug.current)][0]{
   "social": coalesce(social[]{platform, url}, [])
 }`
 
-const postsQuery = `*[_type == "post" && defined(slug.current)] | order(date desc){
+const postsQuery = `*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))] | order(date desc){
   "slug": slug.current,
   title,
   "author": author->slug.current,
@@ -70,7 +70,7 @@ const postsQuery = `*[_type == "post" && defined(slug.current)] | order(date des
   "topics": topics[]->slug.current
 }`
 
-const postQuery = `*[_type == "post" && slug.current == $slug][0]{
+const postQuery = `*[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0]{
   "slug": slug.current,
   title,
   "author": author->slug.current,
@@ -97,7 +97,7 @@ const postQuery = `*[_type == "post" && slug.current == $slug][0]{
   "topics": topics[]->slug.current
 }`
 
-const topicsQuery = `*[_type == "topic" && defined(slug.current)] | order(title){
+const topicsQuery = `*[_type == "topic" && defined(slug.current) && !(_id in path("drafts.**"))] | order(title){
   "slug": slug.current,
   title,
   description
@@ -135,7 +135,7 @@ export function createStore(client: SanityClient): ContentStore {
     },
 
     async getHome() {
-      const data = await client.fetch(`*[_type == "home"][0]{
+      const data = await client.fetch(`*[_type == "home" && !(_id in path("drafts.**"))][0]{
         pageTitle,
         seoTitle,
         seoDescription,
@@ -146,7 +146,7 @@ export function createStore(client: SanityClient): ContentStore {
     },
 
     async getBlog() {
-      const data = await client.fetch(`*[_type == "blog"][0]{
+      const data = await client.fetch(`*[_type == "blog" && !(_id in path("drafts.**"))][0]{
         pageTitle,
         seoTitle,
         seoDescription,
