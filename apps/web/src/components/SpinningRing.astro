@@ -2,27 +2,43 @@
 interface Props {
   text?: string
   href?: string
+  logo?: string
+  label?: string
+  contain?: boolean
+  spin?: boolean
 }
 
-const { text = "DESENVOLVIDO POR IAMVINI.CO · DESENVOLVIDO POR IAMVINI.CO · ", href = "https://iamvini.co" } = Astro.props
+const {
+  text = "DESENVOLVIDO POR IAMVINI.CO · DESENVOLVIDO POR IAMVINI.CO · ",
+  href = "https://iamvini.co",
+  logo = "/iamvinico.png",
+  label = `Desenvolvido por iamvini.co — ${href}`,
+  contain = false,
+  spin = true,
+} = Astro.props
 const letters = text.split("")
+const external = href.startsWith("http")
 ---
 
 <a
   class="spin-ring-wrap"
   href={href}
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label={`Desenvolvido por iamvini.co — ${href}`}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+  aria-label={label}
 >
-  <span class="spin-ring" style={`--total:${letters.length}`} aria-hidden="true">
-    {
-      letters.map((letter, i) => (
-        <span class="spin-letter" style={`--i:${i}`}>
-          {letter === " " ? "\u00A0" : letter}
-        </span>
-      ))
-    }
-  </span>
-  <img class="spin-logo" src="/iamvinico.png" alt="" loading="lazy" />
+  {
+    spin && (
+      <span class="spin-ring" style={`--total:${letters.length}`} aria-hidden="true">
+        {
+          letters.map((letter, i) => (
+            <span class="spin-letter" style={`--i:${i}`}>
+              {letter === " " ? "\u00A0" : letter}
+            </span>
+          ))
+        }
+      </span>
+    )
+  }
+  <img class:list={["spin-logo", contain && "spin-logo--contain"]} src={logo} alt="" loading="lazy" />
 </a>

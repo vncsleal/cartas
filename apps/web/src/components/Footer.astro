@@ -4,11 +4,9 @@ import SpinningRing from "./SpinningRing.astro"
 
 interface Props {
   author: Author | null
-  siteTitle: string
-  word?: string
 }
 
-const { author, siteTitle, word = siteTitle } = Astro.props
+const { author } = Astro.props
 ---
 
 <footer class="footer">
@@ -43,14 +41,17 @@ const { author, siteTitle, word = siteTitle } = Astro.props
   </div>
 
   <div class="footer-word-row">
-    <div class="footer-word" aria-hidden="true">
-      {
-        word
-          .split("")
-          .map((ch) => (ch === "." ? <span class="accent">.</span> : ch))
-      }
-    </div>
     <div class="footer-spin-section">
+      <SpinningRing
+        text="cartas para um astronauta · cartas para um astronauta · "
+        href="/"
+        logo="/astronaut.svg"
+        label="cartas para um astronauta — início"
+        contain={true}
+        spin={false}
+      />
+    </div>
+    <div class="footer-spin-section footer-credit">
       <SpinningRing />
     </div>
   </div>

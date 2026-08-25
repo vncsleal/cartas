@@ -363,32 +363,10 @@
   gap: clamp(1.5rem, 4vw, 4rem);
 }
 
-.footer-word {
-  font-family: var(--font-display);
-  font-size: clamp(3.5rem, 15vw, 14rem);
-  line-height: 0.78;
-  letter-spacing: -0.02em;
-  color: var(--paper-dim);
-  -webkit-text-stroke: 1px var(--hairline);
-  user-select: none;
-  white-space: nowrap;
-  text-align: left;
-  flex: 1;
-  min-width: 0;
-}
-
-.footer-word .accent {
-  color: var(--accent);
-  -webkit-text-stroke: 0;
-}
-
-/* ── Spinning ring (credit line) ── */
+/* ── Spinning rings (credit + site) ── */
 
 .footer-spin-section {
   flex-shrink: 0;
-  /* line-height 0.78 no VNCS empurra o glifo 0.11em pra baixo do box —
-     desloca o anel o mesmo tanto pra alinhar com o texto visível */
-  transform: translateY(calc(clamp(3.5rem, 15vw, 14rem) * 0.11));
 }
 
 .spin-ring-wrap {
@@ -430,6 +408,14 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Full-figure logos (e.g. the astronaut) — no circle crop, kept inside the ring */
+.spin-logo--contain {
+  border-radius: 0;
+  object-fit: contain;
+  width: clamp(60px, 7vw, 80px);
+  height: clamp(60px, 7vw, 80px);
 }
 
 @keyframes spin-ring {

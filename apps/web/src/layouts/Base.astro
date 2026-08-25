@@ -127,7 +127,7 @@ const searchIndex = {
   <body>
     <TopBar siteTitle={siteTitle} />
     <slot />
-    <Footer author={author} siteTitle={siteTitle} word="Cartas." />
+    <Footer author={author} />
     <CommandPalette />
     <CursorPreview />
     <script is:inline type="application/json" data-search-index set:html={JSON.stringify(searchIndex)} />
